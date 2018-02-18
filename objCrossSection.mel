@@ -1,0 +1,91 @@
+global proc create(){
+  global float $rx;
+  global float $ry;
+  global float $rz;
+  string $name[];
+
+
+  $name = `ls -sl`;
+  polyCut -ws 1 -cd Y -ch 1 -df 1 -ef 1 $name;
+  select polyCut1;
+  rename polyCrossSection;
+
+  spaceLocator -p 0 0 0 -n "cutCtr";
+  select;
+  rotate -r -ws -x 90;
+  connectAttr -f cutCtr.translate polyCrossSection.cutPlaneCenter;
+  connectAttr -f cutCtr.rotate polyCrossSection.cutPlaneRotate;
+
+  $rx = `getAttr cutCtr.rotateX`;
+  $ry = `getAttr cutCtr.rotateY`;
+  $rz = `getAttr cutCtr.rotateZ`;
+}
+proc reverse(){
+  global float $rx;
+
+  $rx += 180;
+
+  setAttr "cutCtr.rx" $rx;
+}
+
+
+proc yz(){
+  global float $rx;
+  global float $ry;
+  global float $rz;
+
+  $rx = 0;
+  $ry = 90;
+  $rz = 0;
+
+  setAttr "cutCtr.rx" $rx;
+  setAttr "cutCtr.ry" $ry;
+  setAttr "cutCtr.rz" $rz;
+}
+
+proc zx(){
+  global float $rx;
+  global float $ry;
+  global float $rz;
+
+  $rx = 90;
+  $ry = 0;
+  $rz = 0;
+
+  setAttr "cutCtr.rx" $rx;
+  setAttr "cutCtr.ry" $ry;
+  setAttr "cutCtr.rz" $rz;
+}
+
+proc xy(){
+  global float $rx;
+  global float $ry;
+  global float $rz;
+
+  $rx = 0;
+  $ry = 0;
+  $rz = 0;
+
+  setAttr "cutCtr.rx" $rx;
+  setAttr "cutCtr.ry" $ry;
+  setAttr "cutCtr.rz" $rz;
+}
+
+
+global proc objCrossSection(){
+  window -t "objCrossSection";
+  columnLayout;
+
+  rowLayout -numberOfColumns 2;
+    button -l "Create" -w 150 -h 40 -c "create";
+    button -l "Reverse" -w 150 -h 40 -c "reverse";
+  setParent ..;
+
+  rowLayout -numberOfColumns 3;
+    button -l "YZ" -w 99 -h 40 -c "yz";
+    button -l "ZX" -w 99 -h 40 -c "zx";
+    button -l "XY" -w 99 -h 40 -c "xy";
+  setParent ..;
+
+  showWindow;
+}
